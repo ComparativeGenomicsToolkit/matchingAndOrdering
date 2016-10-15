@@ -1,3 +1,4 @@
+include ../../include.mk
 DIRS := . MinCost GEOM 
 
 SOURCES := $(foreach dir, $(DIRS), $(wildcard $(dir)/*.cpp))
@@ -16,8 +17,6 @@ ifeq ($(UNAME),Darwin)
 	CFLAGS += -DPM_TIMER_GETRUSAGE
 	LIBS := 
 endif
-
-binPath = ../../../sonLib/bin
 
 all: ${binPath}/blossom5 ${binPath}/blossom_randGraph.py
 

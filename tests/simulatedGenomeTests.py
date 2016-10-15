@@ -9,7 +9,7 @@ import os
 
 from sonLib.bioio import getLogLevelString
 from sonLib.bioio import parseSuiteTestOptions
-from sonLib.bioio import system, popenCatch
+from sonLib.bioio import system, popenCatch, getTempFile
 
 import matchingAndOrdering.tests.simulatedGenome
 
@@ -252,9 +252,13 @@ def runReferenceMedianProblemTest(medianHistory, greedyIterations,theta):
         return element
     #Now print out the 
     input = "%i\t%i\t%i\t%i\t%s" % (greedyIterations, nodeNumber, stubNumber, len(weights.keys()), "\t".join([ "%i\t%i\t%f" % (translateLeftSideOfElementToNode(-node1), translateLeftSideOfElementToNode(node2), weights[(node1, node2)]) for (node1, node2) in weights.keys()]))
+    tempPath = getTempFile()
+    with open(tempPath, 'w') as tempFile:
+        tempFile.write(input)
     #Command
     command = os.path.join(os.path.split(os.path.abspath(matchingAndOrdering.tests.simulatedGenome.__file__))[0], "testBin", "referenceMedianProblemTest2")
-    output = popenCatch(command, input)
+    output = popenCatch(command + " < %s" % tempPath)
+    os.remove(tempPath)
     medianChromosome = Chromosome()
     for adjacency in output.split():
         medianChromosome.append(translateLeftNodeToElement(int(adjacency)))

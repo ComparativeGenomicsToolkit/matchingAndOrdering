@@ -1,0 +1,23 @@
+sudo: required
+dist: trusty
+language: c++
+before_install:
+  - git clone https://github.com/UCSCComparativeGenomics/sonLib.git
+install:
+  - sh -c 'cd sonLib && make'
+script:
+  - export sonLibRootPath=`pwd`/sonLib
+  - make
+  - PYTHONPATH=.:.. PATH=./sonLib/bin:$PATH make test
+os:
+  - linux
+  - osx
+env:
+  - CGL_DEBUG=1
+  - CGL_DEBUG=ultra ASAN_OPTIONS=detect_leaks=0
+matrix:
+  exclude:
+    # The default OSX env doesn't have a version that supports
+    # -fsanitize=address.
+    - env: CGL_DEBUG=ultra ASAN_OPTIONS=detect_leaks=0
+      os: osx

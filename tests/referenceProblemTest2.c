@@ -42,7 +42,7 @@ int64_t getRandomNode(int64_t nodeNumber) {
 
 static void setup() {
     teardown();
-    nodeNumber = st_randomInt(0, 100) * 2;
+    nodeNumber = st_randomInt(1, 100) * 2;
     intervalNumber = nodeNumber > 0 ? (nodeNumber > 2 ? st_randomInt(1, nodeNumber / 2) : 1) : 0;
     weightNumber = nodeNumber >= 1 ? st_randomInt(0, nodeNumber * nodeNumber * 4) : 0;
 
@@ -81,14 +81,14 @@ static void checkIsValidReference(CuTest *testCase) {
             CuAssertTrue(testCase, n <= nodeNumber);
             CuAssertTrue(testCase, n >= -nodeNumber);
             CuAssertTrue(testCase, n != 0);
-            CuAssertTrue(testCase, nodes[abs(n) - 1] == 0);
+            CuAssertTrue(testCase, nodes[llabs(n) - 1] == 0);
             CuAssertIntEquals(testCase, first, reference_getFirst(ref, n));
             CuAssertIntEquals(testCase, last, reference_getLast(ref, n));
-            nodes[abs(n) - 1] = 1;
+            nodes[llabs(n) - 1] = 1;
             n = reference_getNext(ref, n);
         }
-        CuAssertTrue(testCase, nodes[abs(n) - 1] == 0);
-        nodes[abs(n) - 1] = 1;
+        CuAssertTrue(testCase, nodes[llabs(n) - 1] == 0);
+        nodes[llabs(n) - 1] = 1;
         //CuAssertIntEquals(testCase, 2*i+2, n);
     }
     for (int64_t i = 0; i < nodeNumber; i++) {

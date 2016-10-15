@@ -32,6 +32,6 @@ clean :
 	cd externalTools && make clean
 	rm -f *.o
 	rm -f ${libPath}/matchingAndOrdering.a ${binPath}/matchingAndOrderingTests ${testBin}/referenceMedianProblemTest
-	
+
 test : all
 	python allTests.py

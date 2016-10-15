@@ -1,4 +1,4 @@
-binPath = ../../../sonLib/bin
+include ../../include.mk
 progs = mwmatching.py matchGraph.py
 
 all: ${progs:%=${binPath}/%}
