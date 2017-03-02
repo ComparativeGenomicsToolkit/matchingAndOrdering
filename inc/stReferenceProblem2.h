@@ -153,4 +153,10 @@ stList *splitReferenceAtIndicatedLocations(reference *ref, bool (*refSplitFn)(in
  */
 stList *remakeReferenceIntervals(reference *ref, stList *referenceIntervalsToPreserve, stList *extraStubNodes);
 
+double exponentiallyDecreasingTemperatureFn(double d);
+
+double constantTemperatureFn(double d);
+
+long double calculateZScore(int64_t n, int64_t m, int64_t k, long double theta);
+
 #endif /* REFERENCEPROBLEM2_H_ */

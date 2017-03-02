@@ -1178,3 +1178,21 @@ stList *remakeReferenceIntervals(reference *ref, stList *referenceIntervalsToPre
     stSortedSet_destruct(extraStubNodesSet);
     return extraStubNodes;
 }
+
+long double calculateZScore(int64_t n, int64_t m, int64_t k, long double theta) {
+    assert(theta <= 1.0);
+    assert(theta >= 0.0);
+    if (theta == 0.0) {
+        return ((long double) n) * ((long double) m);
+    }
+    long double beta = 1.0 - theta;
+    return ((1.0 - pow(beta, (long double)n)) / theta) * pow(beta, (long double)k) * ((1.0 - pow(beta, (long double)m)) / theta);
+}
+
+double exponentiallyDecreasingTemperatureFn(double d) {
+    return 1000 * pow(100000, -d);
+}
+
+double constantTemperatureFn(double d) {
+    return 1;
+}

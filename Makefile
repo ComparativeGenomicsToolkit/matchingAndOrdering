@@ -6,7 +6,7 @@ libHeaders = inc/*.h
 libTests = tests/*.c
 testBin = tests/testBin
 
-all : externalToolsM ${libPath}/matchingAndOrdering.a ${binPath}/matchingAndOrderingTests ${testBin}/referenceMedianProblemTest ${testBin}/referenceMedianProblemTest2
+all : externalToolsM ${libPath}/matchingAndOrdering.a ${binPath}/matchingAndOrderingTests ${testBin}/referenceMedianProblemTest2
 
 externalToolsM : 
 	cd externalTools && make all
@@ -21,9 +21,6 @@ ${libPath}/matchingAndOrdering.a : ${libSources} ${libHeaders} ${basicLibsDepend
 
 ${binPath}/matchingAndOrderingTests : ${libTests} ${libSources} ${libHeaders} ${libPath}/matchingAndOrdering.a ${basicLibsDependencies} 
 	${cxx} ${cflags} -I inc -I impl -I${libPath} -o ${binPath}/matchingAndOrderingTests ${libTests} ${libPath}/matchingAndOrdering.a ${basicLibs}
-
-${testBin}/referenceMedianProblemTest : ${testBin}/referenceMedianProblemTest.c ${libSources} ${libHeaders} ${libPath}/matchingAndOrdering.a ${basicLibsDependencies} 
-	${cxx} ${cflags} -I inc -I impl -I${libPath} -o ${testBin}/referenceMedianProblemTest ${testBin}/referenceMedianProblemTest.c ${libPath}/matchingAndOrdering.a ${basicLibs}
 
 ${testBin}/referenceMedianProblemTest2 : ${testBin}/referenceMedianProblemTest2.c ${libSources} ${libHeaders} ${libPath}/matchingAndOrdering.a ${basicLibsDependencies} 
 	${cxx} ${cflags} -I inc -I impl -I${libPath} -o ${testBin}/referenceMedianProblemTest2 ${testBin}/referenceMedianProblemTest2.c ${libPath}/matchingAndOrdering.a ${basicLibs}
