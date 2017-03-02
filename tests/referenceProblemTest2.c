@@ -10,7 +10,6 @@
 #include <math.h>
 #include <time.h>
 #include "stReferenceProblem2.h"
-#include "stReferenceProblem.h"
 
 static refAdjList *aL = NULL;
 static refAdjList *dAL = NULL;

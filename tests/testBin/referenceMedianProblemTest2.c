@@ -4,7 +4,6 @@
  * Released under the MIT license, see LICENSE.txt
  */
 #include "sonLib.h"
-#include "stReferenceProblem.h"
 #include "stReferenceProblem2.h"
 #include "stMatchingAlgorithms.h"
 
