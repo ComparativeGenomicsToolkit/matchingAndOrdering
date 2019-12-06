@@ -9,7 +9,7 @@ testBin = tests/testBin
 all : externalToolsM ${libPath}/matchingAndOrdering.a ${binPath}/matchingAndOrderingTests ${testBin}/referenceMedianProblemTest2
 
 externalToolsM : 
-	cd externalTools && make all
+	cd externalTools && ${MAKE} all
 
 ${libPath}/matchingAndOrdering.a : ${libSources} ${libHeaders} ${basicLibsDependencies} 
 	${cxx} ${cflags} -I inc -I ${libPath}/ -c ${libSources}
@@ -26,7 +26,7 @@ ${testBin}/referenceMedianProblemTest2 : ${testBin}/referenceMedianProblemTest2.
 	${cxx} ${cflags} -I inc -I impl -I${libPath} -o ${testBin}/referenceMedianProblemTest2 ${testBin}/referenceMedianProblemTest2.c ${libPath}/matchingAndOrdering.a ${basicLibs}
 
 clean : 
-	cd externalTools && make clean
+	cd externalTools && ${MAKE} clean
 	rm -f *.o
 	rm -f ${libPath}/matchingAndOrdering.a ${binPath}/matchingAndOrderingTests ${testBin}/referenceMedianProblemTest
 
