@@ -12,21 +12,20 @@ from matchingAndOrdering.externalTools.blossom.blossomTest import TestCase as bl
 from matchingAndOrdering.tests.cTests import TestCase as cTests
 from matchingAndOrdering.tests.simulatedGenomeTests import TestCase as simulatedGenomeTests
 
-def allSuites(): 
+def allSuites():
     return unittest.TestSuite((unittest.makeSuite(matchGraphTest, 'test'),
-                                   unittest.makeSuite(blossomTest, 'test'),
-                                   unittest.makeSuite(cTests, 'test'),
-                                   unittest.makeSuite(simulatedGenomeTests, 'test')
-                                   ))
+                               unittest.makeSuite(blossomTest, 'test'),
+                               unittest.makeSuite(cTests, 'test'),
+                               unittest.makeSuite(simulatedGenomeTests, 'test')))
 
 def main():
     parseSuiteTestOptions()
-    
+
     suite = allSuites()
     runner = unittest.TextTestRunner()
     i = runner.run(suite)
     return len(i.failures) + len(i.errors)
-        
+
 if __name__ == '__main__':
     import sys
     sys.exit(main())

@@ -1,5 +1,7 @@
-rootPath = ./
-include ./include.mk
+rootPath = .
+include ${rootPath}/include.mk
+
+export PYTHONPATH = ../sonLib/src:..
 
 libSources = impl/*.c
 libHeaders = inc/*.h

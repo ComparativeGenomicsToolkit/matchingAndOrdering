@@ -9,7 +9,7 @@ import os
 
 from sonLib.bioio import getLogLevelString
 from sonLib.bioio import parseSuiteTestOptions
-from sonLib.bioio import system, popenCatch, getTempFile
+from sonLib.bioio import popenCatch, getTempFile
 
 import matchingAndOrdering.tests.simulatedGenome
 
@@ -25,32 +25,32 @@ class TestCase(unittest.TestCase):
         self.replicates = 3
         self.greedyIterations = (100,)
         self.theta = (0.1,) #0.2,0.5,0.9)
-    
+
     def testReferenceAndAsMedianAlgorithms(self):
         """Iterates through a list of simulation variants and prints results
         """
-        headerLine = "\t".join(("elementNumber", "chromosomeNumber", "leafGenomeNumber", 
+        headerLine = "\t".join(("elementNumber", "chromosomeNumber", "leafGenomeNumber",
                                  "operationNumber",
                                  "totalOperationNumber",
-                                 "doInversion", "doShortInversion", "doDcj", "doTranslocation", "doShortTranslocation", 
+                                 "doInversion", "doShortInversion", "doDcj", "doTranslocation", "doShortTranslocation",
                                  "greedyIterations",
                                  "theta",
-                                 "replicate", 
-                                 "medianDCJDistance", "medianOutOfOrderDistance", 
-                                 "weightedMedianOutOfOrderDistance", 
+                                 "replicate",
+                                 "medianDCJDistance", "medianOutOfOrderDistance",
+                                 "weightedMedianOutOfOrderDistance",
                                  "medianDCJDistanceForReferenceAlgorithm",
-                                 "medianOutOfOrderDistanceForReferenceAlgorithm", 
+                                 "medianOutOfOrderDistanceForReferenceAlgorithm",
                                  "weightedMedianOutOfOrderDistanceForReferenceAlgorithm",
                                  "dCJDistanceForReferenceAlgorithmFromMedian",
                                  "outOfOrderDistanceForReferenceAlgorithmFromMedian",
                                  "weightedOutOfOrderDistanceForReferenceAlgorithmFromMedian",
-                                 "medianDCJDistanceForAsMedian", 
-                                 "medianOutOfOrderDistanceForAsMedian", 
-                                 "weightedMedianOutOfOrderDistanceForAsMedian", 
+                                 "medianDCJDistanceForAsMedian",
+                                 "medianOutOfOrderDistanceForAsMedian",
+                                 "weightedMedianOutOfOrderDistanceForAsMedian",
                                  "dCJDistanceForAsMedianFromMedian",
                                  "outOfOrderDistanceForAsMedianFromMedian",
                                  "weightedOutOfOrderDistanceForAsMedianFromMedian",
-                                 "medianGenomeForReferenceAlgorithm", 
+                                 "medianGenomeForReferenceAlgorithm",
                                  "medianGenomeForAsMedian"))
         if getLogLevelString() in  ("DEBUG", "INFO" ):
             print headerLine
@@ -68,8 +68,8 @@ class TestCase(unittest.TestCase):
                                         medianDCJDistance = medianHistory.getMedianDcjDistance(medianHistory.getMedianGenome())
                                         medianOutOfOrderDistance = medianHistory.getMedianOutOfOrderDistance(medianHistory.getMedianGenome())
                                         weightedMedianOutOfOrderDistance = medianHistory.getWeightedMedianOutOfOrderDistance(medianHistory.getMedianGenome(), theta=theta)
-                                        #Now run reference problem algorithm   
-                                        referenceProblemMedianGenome = runReferenceMedianProblemTest(medianHistory, greedyIterations, theta)      
+                                        #Now run reference problem algorithm
+                                        referenceProblemMedianGenome = runReferenceMedianProblemTest(medianHistory, greedyIterations, theta)
                                         medianDCJDistanceForReferenceAlgorithm = medianHistory.getMedianDcjDistance(referenceProblemMedianGenome)
                                         medianOutOfOrderDistanceForReferenceAlgorithm = medianHistory.getMedianOutOfOrderDistance(referenceProblemMedianGenome)
                                         weightedMedianOutOfOrderDistanceForReferenceAlgorithm = medianHistory.getWeightedMedianOutOfOrderDistance(referenceProblemMedianGenome, theta=theta)
@@ -95,23 +95,23 @@ class TestCase(unittest.TestCase):
                                             outOfOrderDistanceForAsMedianFromMedian = "n/a"
                                             weightedOutOfOrderDistanceForAsMedianFromMedian = "n/a"
                                         #Now prepare line to print
-                                        line = "\t".join([ str(i) for i in 
-                                        (elementNumber, chromosomeNumber, leafGenomeNumber, 
+                                        line = "\t".join([ str(i) for i in
+                                        (elementNumber, chromosomeNumber, leafGenomeNumber,
                                          operationNumber,
                                          totalOperationNumber,
                                          doInversion, doShortInversion, doDcj, doTranslocation, doShortTranslocation,
                                          greedyIterations,
                                          theta,
-                                         replicate, 
-                                         medianDCJDistance, medianOutOfOrderDistance, 
+                                         replicate,
+                                         medianDCJDistance, medianOutOfOrderDistance,
                                          weightedMedianOutOfOrderDistance,
                                          medianDCJDistanceForReferenceAlgorithm,
-                                         medianOutOfOrderDistanceForReferenceAlgorithm, 
-                                         weightedMedianOutOfOrderDistanceForReferenceAlgorithm, 
+                                         medianOutOfOrderDistanceForReferenceAlgorithm,
+                                         weightedMedianOutOfOrderDistanceForReferenceAlgorithm,
                                          dCJDistanceForReferenceAlgorithmFromMedian,
                                          outOfOrderDistanceForReferenceAlgorithmFromMedian,
                                          weightedOutOfOrderDistanceForReferenceAlgorithmFromMedian,
-                                         medianDCJDistanceForAsMedian, 
+                                         medianDCJDistanceForAsMedian,
                                          medianOutOfOrderDistanceForAsMedian,
                                          weightedMedianOutOfOrderDistanceForAsMedian,
                                          dCJDistanceForAsMedianFromMedian,
@@ -122,7 +122,7 @@ class TestCase(unittest.TestCase):
                                         #Print line
                                         if getLogLevelString() in ("DEBUG", "INFO"):
                                             print line
-    
+
     def testChromosome(self):
         """Test basic functions of a chromosome.
         """
@@ -133,40 +133,40 @@ class TestCase(unittest.TestCase):
         #Test string generator
         self.assertEquals(c.getOrderedElements(), [ 1, 2 ])
         self.assertEqual(str(c), "1 2")
-        
+
         #Test get reverse
         d = c.getReverse()
         self.assertEqual(str(c), "1 2")
         self.assertEqual(str(d), "-2 -1")
-        
+
         #Test fuse
         e = c.fuse(d)
         self.assertEqual(str(c), "1 2")
         self.assertEqual(str(d), "-2 -1")
         self.assertEqual(str(e), "1 2 -2 -1")
-        
+
         #Test fuse of null chromosome
         e = e.fuse(Chromosome())
         self.assertEquals(e.getOrderedElements(), [ 1, 2, -2, -1 ])
         self.assertEqual(str(e), "1 2 -2 -1")
-        
+
         #Test random breakpoint
         for i in xrange(10):
             f, g = e.getRandomBreakpoint()
             self.assertEqual(str(f.fuse(g)), "1 2 -2 -1")
-        
+
         self.assertEqual(str(d), str(d.clone()))
-        
+
     def testGenome(self):
         """Test basic functions of a genome
         """
         d = Genome(elementNumber=10, chromosomeNumber=3)
         self.assertEqual(d.getChromosomeNumber(), 3)
         self.assertEqual(d.getElements(), set(range(1, 11)))
-        
+
         #Test clone
         self.assertEqual(str(d), str(d.clone()))
-        
+
         #Test inversions
         for i in xrange(100):
             e = d.clone()
@@ -177,7 +177,7 @@ class TestCase(unittest.TestCase):
             self.assertEquals(e.getElements(), d.getElements())
             self.assertTrue(d.getOutOfOrderDistance(e) >= 0)
             self.assertTrue(d.getCircularDcjDistance(e) in [ 0, 1 ])
-            
+
         #Test dcj
         for i in xrange(100):
             e = d.clone()
@@ -187,7 +187,7 @@ class TestCase(unittest.TestCase):
             self.assertEquals(e.getElements(), d.getElements())
             self.assertTrue(d.getOutOfOrderDistance(e) >= 0)
             self.assertTrue(d.getCircularDcjDistance(e) in [ 0, 1, 2 ])
-        
+
         #Test translocations
         for i in xrange(100):
             e = d.clone()
@@ -207,7 +207,7 @@ def runAsMedianMedianProblemTest(medianHistory):
     fileHandle = open(tempFile, 'w')
     fileHandle.write(medianHistory.getLeafGenomeString())
     fileHandle.close()
-    #-cp /Users/benedictpaten/Desktop/ASMedian-1.0 
+    #-cp /Users/benedictpaten/Desktop/ASMedian-1.0
     popenCatch("java BIOMedian %s" % tempFile)
     os.remove(tempFile)
     #Parse in
@@ -240,17 +240,17 @@ def runReferenceMedianProblemTest(medianHistory, greedyIterations,theta):
                 weights[(node1, node2)] = weightFn(distance, theta)
     def translateLeftSideOfElementToNode(element):
         assert element != 0
-        if element < 0:        
+        if element < 0:
             return abs(element) * 2
         return element * 2 + 1
     def translateLeftNodeToElement(node):
         assert node >= stubNumber
         assert node < nodeNumber
-        element = node / 2 
+        element = node / 2
         if (node % 2) == 0:
             element *= -1
         return element
-    #Now print out the 
+    #Now print out the
     input = "%i\t%i\t%i\t%i\t%s" % (greedyIterations, nodeNumber, stubNumber, len(weights.keys()), "\t".join([ "%i\t%i\t%f" % (translateLeftSideOfElementToNode(-node1), translateLeftSideOfElementToNode(node2), weights[(node1, node2)]) for (node1, node2) in weights.keys()]))
     tempPath = getTempFile()
     with open(tempPath, 'w') as tempFile:
@@ -271,6 +271,6 @@ def main():
     parseSuiteTestOptions()
     sys.argv = sys.argv[:1]
     unittest.main()
-        
+
 if __name__ == '__main__':
     main()

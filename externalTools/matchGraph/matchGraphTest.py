@@ -26,7 +26,7 @@ class TestCase(unittest.TestCase):
 
     def setUp(self):
         #This is the number of random problems to solve, handed to the test code
-        self.testNo = TestStatus.getTestSetup(shortTestNo=1, mediumTestNo=5, 
+        self.testNo = TestStatus.getTestSetup(shortTestNo=1, mediumTestNo=5,
                                               longTestNo=10, veryLongTestNo=100)
         self.tempFiles = []
         self.tempDir = getTempDirectory(os.getcwd())
@@ -100,10 +100,9 @@ class TestCase(unittest.TestCase):
             logger.info("Ran the test(s) of the matchGraph program okay")
 
 def main():
-    parseSuiteTestOptions()   
+    parseSuiteTestOptions()
     sys.argv = sys.argv[:1]
     unittest.main()
-        
+
 if __name__ == '__main__':
     main()
-

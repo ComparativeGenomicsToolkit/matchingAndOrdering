@@ -1,4 +1,6 @@
-include ../../include.mk
+rootPath = ../..
+include ${rootPath}/include.mk
+
 DIRS := . MinCost GEOM 
 
 SOURCES := $(foreach dir, $(DIRS), $(wildcard $(dir)/*.cpp))
