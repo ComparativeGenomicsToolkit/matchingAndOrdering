@@ -33,4 +33,4 @@ clean :
 	rm -f ${libPath}/matchingAndOrdering.a ${binPath}/matchingAndOrderingTests ${testBin}/referenceMedianProblemTest
 
 test : all
-	python allTests.py
+	${PYTHON} allTests.py
