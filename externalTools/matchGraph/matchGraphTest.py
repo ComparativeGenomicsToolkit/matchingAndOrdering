@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #Copyright (C) 2011 by Benedict Paten (benedictpaten@gmail.com)
 #
@@ -45,7 +45,7 @@ class TestCase(unittest.TestCase):
         """ Tests matchGraph.py program using randGraph.py input
         """
 
-        for test in xrange(self.testNo):
+        for test in range(self.testNo):
             tempInputFile = getTempFile()
             tempOutputFile = getTempFile()
 
@@ -83,8 +83,8 @@ class TestCase(unittest.TestCase):
                     vertexArray[vertexJ] += 1
 
                     # Vertex indices must be 0<= i,j < V
-                    self.assertTrue(vertexI in xrange(vertexNum))
-                    self.assertTrue(vertexJ in xrange(vertexNum))
+                    self.assertTrue(vertexI in range(vertexNum))
+                    self.assertTrue(vertexJ in range(vertexNum))
                 lineIdx += 1
 
             # Must have the correct number of edges
