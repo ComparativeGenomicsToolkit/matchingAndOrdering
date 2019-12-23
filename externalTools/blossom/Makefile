@@ -6,9 +6,8 @@ DIRS := . MinCost GEOM
 SOURCES := $(foreach dir, $(DIRS), $(wildcard $(dir)/*.cpp))
 OBJS := $(patsubst %.cpp, %.o, $(SOURCES))
 
-#CFLAGS := -O5 -D_NDEBUG -ggdb
-CFLAGS := -D_NDEBUG -ggdb
-CC := c++
+CXXFLAGS := ${cppflags}
+CXX := ${cpp}
 LIBS :=  -lrt 
 INCLUDES := 
 LIBDIR := 
@@ -16,7 +15,7 @@ LIBDIR :=
 # Mac OS X specific stuff
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Darwin)
-	CFLAGS += -DPM_TIMER_GETRUSAGE
+	CXXFLAGS += -DPM_TIMER_GETRUSAGE
 	LIBS := 
 endif
 
@@ -27,11 +26,11 @@ ${binPath}/blossom_randGraph.py: blossom_randGraph.py
 	chmod +x ${binPath}/blossom_randGraph.py
 
 ${binPath}/blossom5: ${OBJS}
-	${CC} ${CFLAGS} ${LIBDIR} -o $@ ${OBJS} ${LIBS}
+	${CXX} ${CXXFLAGS} ${LIBDIR} -o $@ ${OBJS} ${LIBS}
 	chmod +x ${binPath}/blossom5
 
 .cpp.o:
-	$(CC) $(CFLAGS) ${INCLUDES} $< -c -o $@
+	$(CXX) $(CXXFLAGS) ${INCLUDES} $< -c -o $@
 
 clean:
 	rm -f ${OBJS}
