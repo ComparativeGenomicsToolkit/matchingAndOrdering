@@ -6,7 +6,7 @@ import sys
 def weightFn(distance, theta):
     """Weight function
     """
-    if theta == sys.maxint:
+    if theta == sys.maxsize:
         return 1.0/distance #Hack for now
     #return 1
     assert distance >= 1
@@ -17,7 +17,7 @@ class Chromosome:
         """Creates an empty chromosome, which is a list of signed integers, and which is immutable.
         """
         self.chromosome = []
-    
+
     def getRandomBreakpoint(self):
         """Creates a split chromosome
         """
@@ -27,14 +27,14 @@ class Chromosome:
         a.chromosome = self.chromosome[:i]
         b.chromosome = self.chromosome[i:]
         return a, b
-    
+
     def getRandomSegment(self):
         """Creates a split chromosome
         """
         a, b = self.getRandomBreakpoint()
         b, c = b.getRandomBreakpoint()
         return a, b, c
-    
+
     def getReverse(self):
         """Returns reverse
         """
@@ -42,36 +42,36 @@ class Chromosome:
         c.chromosome = [ -element for element in self.chromosome ]
         c.chromosome.reverse()
         return c
-        
+
     def append(self, element):
         """Adds an element to the chromosome
         """
-        assert int(element) == element
+        assert isinstance(element, int)
         assert element != 0
         self.chromosome.append(element)
-        
+
     def fuse(self, _3End):
         """Joins two chromosomes together
         """
         fusedChromosome = Chromosome()
         fusedChromosome.chromosome = self.chromosome[:] + _3End.chromosome[:]
         return fusedChromosome
-    
+
     def clone(self):
         """Copies the chromosome
         """
         c = Chromosome()
         c.chromosome = self.chromosome[:]
         return c
-    
+
     def getOrderedElements(self):
         """Returns an ordered and oriented list of the elements
         """
         return self.chromosome[:]
-    
+
     def __len__(self):
         return len(self.chromosome)
-    
+
     def __str__(self):
         """Make chromosome string
         """
@@ -84,16 +84,16 @@ class Genome:
         assert chromosomeNumber >= 0
         assert elementNumber >= chromosomeNumber
         self.chromosomes = []
-        for i in xrange(chromosomeNumber):
+        for i in range(chromosomeNumber):
             chromosome = Chromosome()
             chromosome.append(i+1)
             self.chromosomes.append(chromosome)
-        for element in xrange(chromosomeNumber+1, elementNumber+1):
+        for element in range(chromosomeNumber+1, elementNumber+1):
             random.choice(self.chromosomes).append(element)
-    
+
     def getChromosomeNumber(self):
         return len(self.chromosomes)
-        
+
     def getElements(self):
         """Gets set of elements (ints) in genome
         """
@@ -102,14 +102,14 @@ class Genome:
             for element in chromosome.getOrderedElements():
                 elements.add(abs(element))
         return elements
-        
+
     def clone(self):
         """Clone the genome
         """
         g = Genome()
         g.chromosomes = [ chromosome.clone() for chromosome in self.chromosomes ]
         return g
-    
+
     def permuteByInversion(self, acceptableInversionLengths=None):
         """Apply a inversion op randomly to the genome
         """
@@ -118,7 +118,7 @@ class Genome:
         if acceptableInversionLengths != None and len(b) not in acceptableInversionLengths:
             return self.permuteByInversion(acceptableInversionLengths=acceptableInversionLengths)
         self.replaceChromosome(chr1, a.fuse(b.getReverse()).fuse(c))
-        
+
     def permuteByDcj(self):
         """Apply a DCJ op randomly to the genome
         """
@@ -138,7 +138,7 @@ class Genome:
                 c, d = d.getReverse(), c.getReverse()
             self.replaceChromosome(chr1, a.fuse(d))
             self.replaceChromosome(chr2, c.fuse(b))
-        
+
     def permuteByTranslocation(self, invertProb=0.5, acceptableTranslocationLengths=None):
         """Apply a translocation op randomly to the genome
         """
@@ -164,13 +164,13 @@ class Genome:
             if random.random() > invertProb: #Invert translocated with random prob
                 b = b.getReverse()
             self.replaceChromosome(chr1, a.fuse(c))
-            self.replaceChromosome(chr2, d.fuse(b).fuse(e)) 
-        
+            self.replaceChromosome(chr2, d.fuse(b).fuse(e))
+
     def __str__(self):
         """Make genome string
         """
         return " & ".join([ str(chromosome) for chromosome in self.chromosomes ])
-    
+
     def getWeightedOutOfOrderDistance(self, otherGenome, theta):
         """Computes fraction of transitive adjacencies shared by two.
         """
@@ -191,7 +191,7 @@ class Genome:
         p2 = stripDistances(tA2)
         pI = p1.intersection(p2)
         return 1.0 - (sumWeights(pI, dH1) + sumWeights(pI, dH2)) / (sumWeights(p1, dH1) + sumWeights(p2, dH2))
-    
+
     def getOutOfOrderDistance(self, otherGenome):
         """Computes fraction of transitive adjacencies shared by two.
         """
@@ -200,7 +200,7 @@ class Genome:
         a = stripDistances(self.getTransitiveAdjacencies())
         b = stripDistances(otherGenome.getTransitiveAdjacencies())
         return 1.0 - len(a.intersection(b)) / float(len(a.union(b)))
-    
+
     def getCircularDcjDistance(self, otherGenome):
         """Computes DCJ Distance
         """
@@ -219,23 +219,23 @@ class Genome:
             if element in greyAdjacencies:
                 cycles += 1
                 fn(greyAdjacencies, blackAdjacencies, element)
-        assert len(greyAdjacencies.values()) == 0
-        assert len(blackAdjacencies.values()) == 0
+        assert len(list(greyAdjacencies.values())) == 0
+        assert len(list(blackAdjacencies.values())) == 0
         assert cycles % 2 == 0 #Cycles get traversed in both directions
         return len(self.getElements()) - cycles/2
-    
+
     #Remaining functions are private
-    
+
     def addChromosome(self, chromosome):
         if len(chromosome) > 0:
             self.chromosomes.append(chromosome)
-    
+
     def getRandomChromosome(self):
         """Get random chromosome in genome
         """
         chr = random.choice(self.chromosomes)
         return chr
-    
+
     def replaceChromosome(self, previousChr, newChr):
         """Replace chromosome present in the genome
         """
@@ -244,15 +244,15 @@ class Genome:
             self.chromosomes.remove(previousChr)
         else:
             self.chromosomes[self.chromosomes.index(previousChr)] = newChr
-    
+
     def getTransitiveAdjacencies(self):
         """Get set of transitive adjacencies
         """
         adjacencies = set()
         for chromosome in self.chromosomes:
             chrString = chromosome.getOrderedElements()
-            for i in xrange(0, len(chrString)):
-                for j in xrange(i+1, len(chrString)):
+            for i in range(0, len(chrString)):
+                for j in range(i+1, len(chrString)):
                     assert chrString[i] != chrString[j]
                     oP = (chrString[i], chrString[j], j - i)
                     assert oP not in adjacencies
@@ -262,7 +262,7 @@ class Genome:
                     assert oP not in adjacencies
                     adjacencies.add(oP)
         return adjacencies
-    
+
     def getCircularAdjacencies(self):
         """Gets set of direct 'abutting' adjacencies as hash, treating chromosomes as circular
         """
@@ -270,7 +270,7 @@ class Genome:
         for chromosome in self.chromosomes:
             chrString = chromosome.getOrderedElements()
             assert len(chrString) > 0
-            for i in xrange(len(chrString)-1):
+            for i in range(len(chrString)-1):
                 leftElement = -chrString[i]
                 rightElement = chrString[i+1]
                 assert abs(leftElement) != abs(rightElement)
@@ -286,21 +286,21 @@ class Genome:
             adjacencies[leftElement] = rightElement
             adjacencies[rightElement] = leftElement
         return adjacencies
-    
+
 class MedianHistory:
     """Represents a simulation of a median genome and its children
     """
     def __init__(self, medianGenome, leafGenomeNumber):
         self.medianGenome = medianGenome
-        self.leafGenomes = [ medianGenome.clone() for i in xrange(leafGenomeNumber) ]
-        
+        self.leafGenomes = [ medianGenome.clone() for i in range(leafGenomeNumber) ]
+
     def permuteLeafGenomes(self, operationNumber=1, doInversion=False, doShortInversion=False,
                            doDcj=False, doTranslocation=False, doShortTranslocation=False):
         """Permutes the child genomes using the given operator types, each for
-        operationNumber of times. 
+        operationNumber of times.
         """
         for leafGenome in self.leafGenomes:
-            for i in xrange(operationNumber):
+            for i in range(operationNumber):
                 if doInversion:
                     leafGenome.permuteByInversion()
                 if doShortInversion:
@@ -311,23 +311,23 @@ class MedianHistory:
                     leafGenome.permuteByTranslocation()
                 if doShortTranslocation:
                     leafGenome.permuteByTranslocation(acceptableTranslocationLengths=(1,))
-                    
+
     def getMedianGenome(self):
         return self.medianGenome
-    
+
     def getLeafGenomes(self):
         return self.leafGenomes[:]
-        
+
     def getLeafGenomeString(self):
         """Gets string in GRIMM format representing the leaf genomes
         """
         return "".join([ '>\n%s\n' % str(leafGenome) for leafGenome in self.leafGenomes ])
-    
+
     def getMedianDcjDistance(self, genome):
         """Gets the median DCJ Distance
         """
         return sum([ leafGenome.getCircularDcjDistance(genome) for leafGenome in self.leafGenomes ])/len(self.leafGenomes)
-    
+
     def getMedianOutOfOrderDistance(self, genome):
         """Gets the median out of order distance
         """
@@ -337,5 +337,3 @@ class MedianHistory:
         """Gets the median out of order distance
         """
         return sum([ leafGenome.getWeightedOutOfOrderDistance(genome, theta=theta) for leafGenome in self.leafGenomes ])/len(self.leafGenomes)
-
-

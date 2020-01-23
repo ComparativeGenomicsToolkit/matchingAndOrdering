@@ -1,3 +1,6 @@
+rootPath = ..
+include ${rootPath}/include.mk
+
 # order is important, libraries first
 modules = blossom matchGraph
 #pulldown

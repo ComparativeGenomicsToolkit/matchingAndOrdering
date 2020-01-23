@@ -4,6 +4,7 @@ sonLibPath=${sonLibRootPath}/lib
 #Use sonLib bin and lib dirs
 binPath=${sonLibRootPath}/bin
 libPath=${sonLibPath}
+export PATH := ${binPath}:${PATH}
 
 include  ${sonLibRootPath}/include.mk
 

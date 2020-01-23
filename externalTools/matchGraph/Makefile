@@ -1,4 +1,5 @@
-include ../../include.mk
+rootPath = ../..
+include ${rootPath}/include.mk
 progs = mwmatching.py matchGraph.py
 
 all: ${progs:%=${binPath}/%}

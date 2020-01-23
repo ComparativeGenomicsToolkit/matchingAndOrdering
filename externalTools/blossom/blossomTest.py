@@ -20,7 +20,7 @@ class TestCase(unittest.TestCase):
 
     def setUp(self):
         #This is the number of random problems to solve, handed to the test code
-        self.testNo = TestStatus.getTestSetup(shortTestNo=1, mediumTestNo=5, 
+        self.testNo = TestStatus.getTestSetup(shortTestNo=1, mediumTestNo=5,
                                               longTestNo=10, veryLongTestNo=100)
         self.tempFiles = []
         self.tempDir = getTempDirectory(os.getcwd())
@@ -39,7 +39,7 @@ class TestCase(unittest.TestCase):
         """ Tests blossom5 program using randGraph.py input
         """
 
-        for test in xrange(self.testNo):
+        for test in range(self.testNo):
             tempInputFile = getTempFile()
             tempOutputFile = getTempFile()
 
@@ -77,8 +77,8 @@ class TestCase(unittest.TestCase):
                     vertexArray[vertexJ] += 1
 
                     # Vertex indices must be 0<= i,j < V
-                    self.assertTrue(vertexI in xrange(vertexNum))
-                    self.assertTrue(vertexJ in xrange(vertexNum))
+                    self.assertTrue(vertexI in range(vertexNum))
+                    self.assertTrue(vertexJ in range(vertexNum))
                 lineIdx += 1
 
             # Must have the correct number of edges
@@ -94,10 +94,9 @@ class TestCase(unittest.TestCase):
             logger.info("Ran the test(s) of the blossom program okay")
 
 def main():
-    parseSuiteTestOptions()   
+    parseSuiteTestOptions()
     sys.argv = sys.argv[:1]
     unittest.main()
-        
+
 if __name__ == '__main__':
     main()
-

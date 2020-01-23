@@ -1,5 +1,7 @@
-rootPath = ./
-include ./include.mk
+rootPath = .
+include ${rootPath}/include.mk
+
+export PYTHONPATH = ../sonLib/src:..
 
 libSources = impl/*.c
 libHeaders = inc/*.h
@@ -31,4 +33,4 @@ clean :
 	rm -f ${libPath}/matchingAndOrdering.a ${binPath}/matchingAndOrderingTests ${testBin}/referenceMedianProblemTest
 
 test : all
-	python allTests.py
+	${PYTHON} allTests.py

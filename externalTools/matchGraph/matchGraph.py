@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #Copyright (C) 2011 by Benedict Paten (benedictpaten@gmail.com)
 #
@@ -12,7 +12,7 @@ The input file format is:
 
 Line 0 contains the number of vertices V and the number of edges E.
 Lines 1 to E contain the edges referenced by vertex index i, j with weight w.
-  Vertices i and j, as well as weight w are integers and the indices start  
+  Vertices i and j, as well as weight w are integers and the indices start
   with 0.
 
 The output file format is identical to the input format except that the
@@ -24,19 +24,19 @@ import mwmatching
 import sys
 
 def usage():
-    print "matchGraph.py -e inputFile -w outputFile [-c]"
-    print "\t-e inputFile is the input filename"
-    print "\t-w outputFile is the output filename"
-    print ""
-    print "Optional:"
-    print "\t-c Report the max cardinality matching"   
+    print("matchGraph.py -e inputFile -w outputFile [-c]")
+    print("\t-e inputFile is the input filename")
+    print("\t-w outputFile is the output filename")
+    print("")
+    print("Optional:")
+    print("\t-c Report the max cardinality matching")
 
 def main():
     # Process the cmd-line arguments
     try:
         optlist, args = getopt.getopt(sys.argv[1:], 'e:w:ch')
-    except getopt.GetoptError, err:
-        print str(err)
+    except getopt.GetoptError as err:
+        print(str(err))
         usage()
         sys.exit(-1)
 
@@ -51,20 +51,20 @@ def main():
        elif o == '-h':
            usage()
            sys.exit()
-       else:   
+       else:
            assert False, "unhandled option"
 
     # Must specify input and output filenames
     try:
        inputFile
     except:
-       print "Need to specify input filename"
+       print("Need to specify input filename")
        usage()
        sys.exit()
     try:
        outputFile
     except:
-       print "Need to specify output filename"
+       print("Need to specify output filename")
        usage()
        sys.exit()
 
@@ -73,7 +73,7 @@ def main():
     try:
         f = open(inputFile, 'r')
     except IOError:
-        print "Cannot open %s" % (inputFile)
+        print("Cannot open %s" % (inputFile))
         sys.exit()
     lineIdx = 0
     for line in f:
@@ -88,7 +88,7 @@ def main():
             vertexJ = int(vertexJ)
             weight = int(weight)
             if weight < 0:
-                print "Error: Weights must be >= 0"
+                print("Error: Weights must be >= 0")
                 sys.exit(-1)
             graphArray.append((vertexI, vertexJ, weight))
         lineIdx += 1
@@ -115,9 +115,9 @@ def main():
     try:
         f = open(outputFile, 'w')
     except IOError:
-        print "Cannot open %s" % (outputFile)
+        print("Cannot open %s" % (outputFile))
         sys.exit()
-       
+
     header = "%d %d" % (vertexNum, matchVertexCount/2)
     f.write(header + "\n")
     for edge in matchGraphHash:
