@@ -1,12 +1,13 @@
 #Modify this variable to set the location of sonLib
-sonLibRootPath?=${rootPath}/../sonLib
-sonLibPath=${sonLibRootPath}/lib
+sonLibRootDir?=${rootPath}/../sonLib
+sonLibDir=${sonLibRootDir}/lib
 #Use sonLib bin and lib dirs
-binPath=${sonLibRootPath}/bin
-libPath=${sonLibPath}
-export PATH := ${binPath}:${PATH}
+BINDIR=${sonLibRootDir}/bin
+LIBDIR=${sonLibDir}
+export PATH := ${BINDIR}:${PATH}
 
-include  ${sonLibRootPath}/include.mk
+include  ${sonLibRootDir}/include.mk
 
-basicLibs = ${sonLibPath}/sonLib.a ${sonLibPath}/cuTest.a ${dblibs}
-basicLibsDependencies = ${sonLibPath}/sonLib.a ${sonLibPath}/cuTest.a 
+CPPFLAGS += -I${sonLibRootDir}/C/inc
+LDLIBS += ${sonLibDir}/sonLib.a ${sonLibDir}/cuTest.a ${dblibs}
+LIBDEPENDS += ${sonLibDir}/sonLib.a ${sonLibDir}/cuTest.a 

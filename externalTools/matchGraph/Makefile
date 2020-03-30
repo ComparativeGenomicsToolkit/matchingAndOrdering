@@ -2,11 +2,11 @@ rootPath = ../..
 include ${rootPath}/include.mk
 progs = mwmatching.py matchGraph.py
 
-all: ${progs:%=${binPath}/%}
+all: ${progs:%=${BINDIR}/%}
 
-${binPath}/%: %
+${BINDIR}/%: %
 	cp -f $< $@
 	chmod 775 $@
 
 clean:
-	rm -f  ${progs:%=${binPath}/%}
+	rm -f  ${progs:%=${BINDIR}/%}

@@ -6,8 +6,6 @@ DIRS := . MinCost GEOM
 SOURCES := $(foreach dir, $(DIRS), $(wildcard $(dir)/*.cpp))
 OBJS := $(patsubst %.cpp, %.o, $(SOURCES))
 
-CXXFLAGS := ${cppflags}
-CXX := ${cpp}
 LIBS :=  -lrt 
 INCLUDES := 
 LIBDIR := 
@@ -19,19 +17,19 @@ ifeq ($(UNAME),Darwin)
 	LIBS := 
 endif
 
-all: ${binPath}/blossom5 ${binPath}/blossom_randGraph.py
+all: ${BINDIR}/blossom5 ${BINDIR}/blossom_randGraph.py
 
-${binPath}/blossom_randGraph.py: blossom_randGraph.py
-	cp blossom_randGraph.py ${binPath}
-	chmod +x ${binPath}/blossom_randGraph.py
+${BINDIR}/blossom_randGraph.py: blossom_randGraph.py
+	cp blossom_randGraph.py ${BINDIR}
+	chmod +x ${BINDIR}/blossom_randGraph.py
 
-${binPath}/blossom5: ${OBJS}
+${BINDIR}/blossom5: ${OBJS}
 	${CXX} ${CXXFLAGS} ${LIBDIR} -o $@ ${OBJS} ${LIBS}
-	chmod +x ${binPath}/blossom5
+	chmod +x ${BINDIR}/blossom5
 
 .cpp.o:
 	$(CXX) $(CXXFLAGS) ${INCLUDES} $< -c -o $@
 
 clean:
 	rm -f ${OBJS}
-	rm -f ${binPath}/blossom5 ${binPath}/blossom_randGraph.py
+	rm -f ${BINDIR}/blossom5 ${BINDIR}/blossom_randGraph.py

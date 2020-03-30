@@ -8,29 +8,30 @@ libHeaders = inc/*.h
 libTests = tests/*.c
 testBin = tests/testBin
 
-all : externalToolsM ${libPath}/matchingAndOrdering.a ${binPath}/matchingAndOrderingTests ${testBin}/referenceMedianProblemTest2
+CPPFLAGS += -Iimpl -I../sonLib/externalTools/cutest/
+
+all : externalToolsM ${LIBDIR}/matchingAndOrdering.a ${BINDIR}/matchingAndOrderingTests ${testBin}/referenceMedianProblemTest2
 
 externalToolsM : 
 	cd externalTools && ${MAKE} all
 
-${libPath}/matchingAndOrdering.a : ${libSources} ${libHeaders} ${basicLibsDependencies} 
-	${cxx} ${cflags} -I inc -I ${libPath}/ -c ${libSources}
-	ar rc matchingAndOrdering.a *.o
-	ranlib matchingAndOrdering.a 
-	rm *.o
-	mv matchingAndOrdering.a ${libPath}/
-	cp ${libHeaders} ${libPath}/
+${LIBDIR}/matchingAndOrdering.a : ${libSources} ${libHeaders}
+	${CC} ${CPPFLAGS} ${CFLAGS} -c ${libSources}
+	${AR} rc matchingAndOrdering.a *.o
+	${RANLIB} matchingAndOrdering.a 
+	mv matchingAndOrdering.a ${LIBDIR}/
+	cp ${libHeaders} ${LIBDIR}/
 
-${binPath}/matchingAndOrderingTests : ${libTests} ${libSources} ${libHeaders} ${libPath}/matchingAndOrdering.a ${basicLibsDependencies} 
-	${cxx} ${cflags} -I inc -I impl -I${libPath} -o ${binPath}/matchingAndOrderingTests ${libTests} ${libPath}/matchingAndOrdering.a ${basicLibs}
+${BINDIR}/matchingAndOrderingTests : ${libTests} ${libSources} ${libHeaders} ${LIBDIR}/matchingAndOrdering.a ${LIBDEPENDS}
+	${CC} ${CFLAGS} ${CPPFLAGS} -o ${BINDIR}/matchingAndOrderingTests ${libTests} ${LIBDIR}/matchingAndOrdering.a ${LDLIBS}
 
-${testBin}/referenceMedianProblemTest2 : ${testBin}/referenceMedianProblemTest2.c ${libSources} ${libHeaders} ${libPath}/matchingAndOrdering.a ${basicLibsDependencies} 
-	${cxx} ${cflags} -I inc -I impl -I${libPath} -o ${testBin}/referenceMedianProblemTest2 ${testBin}/referenceMedianProblemTest2.c ${libPath}/matchingAndOrdering.a ${basicLibs}
+${testBin}/referenceMedianProblemTest2 : ${testBin}/referenceMedianProblemTest2.c ${libSources} ${libHeaders} ${LIBDIR}/matchingAndOrdering.a ${LIBDEPENDS} 
+	${CC} ${CFLAGS} ${CPPFLAGS} -o ${testBin}/referenceMedianProblemTest2 ${testBin}/referenceMedianProblemTest2.c ${LIBDIR}/matchingAndOrdering.a ${LDLIBS}
 
 clean : 
 	cd externalTools && ${MAKE} clean
 	rm -f *.o
-	rm -f ${libPath}/matchingAndOrdering.a ${binPath}/matchingAndOrderingTests ${testBin}/referenceMedianProblemTest
+	rm -f ${LIBDIR}/matchingAndOrdering.a ${BINDIR}/matchingAndOrderingTests ${testBin}/referenceMedianProblemTest
 
 test : all
 	${PYTHON} allTests.py
