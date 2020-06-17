@@ -561,7 +561,7 @@ static stList *getRelevantEdges(refAdjList *aL, reference *ref, int64_t n) {
     }
     refAdjListIt_destruct(&it);
     //Now do sorting to determine ordering
-    stList_sort2(edges, (int(*)(const void *, const void *, const void *)) refEdge_cmpByReferencePosition, ref);
+    stList_sort2(edges, (int(*)(const void *, const void *, void *)) refEdge_cmpByReferencePosition, ref);
     return edges;
 }
 
@@ -581,7 +581,7 @@ static stList *getInsertPointsPrevious(int64_t n, stList *edges, reference *ref)
             stList_append(insertPoints, insertPoint_construct(n, refEdge_to(e), 1, f, reference_getNext(ref, reference_getNext(ref, refEdge_to(e))) == INT64_MAX ? 0 : 1));
         }
     }
-    stList_sort2(insertPoints, (int(*)(const void *, const void *, const void *))insertPoint_cmp, ref);
+    stList_sort2(insertPoints, (int(*)(const void *, const void *, void *))insertPoint_cmp, ref);
     return insertPoints;
 }
 
@@ -601,7 +601,7 @@ static stList *getInsertPointsNext(int64_t n, stList *edges, reference *ref) {
             stList_append(insertPoints, insertPoint_construct(n, refEdge_to(e), 0, f, reference_getPrevious(ref, reference_getPrevious(ref, refEdge_to(e))) == INT64_MAX ? 0 : 1));
         }
     }
-    stList_sort2(insertPoints, (int(*)(const void *, const void *, const void *))insertPoint_cmp, ref);
+    stList_sort2(insertPoints, (int(*)(const void *, const void *, void *))insertPoint_cmp, ref);
     return insertPoints;
 }
 
