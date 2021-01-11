@@ -33,7 +33,7 @@ int64_t convertIN(int64_t n, int64_t stubNumber, int64_t nodeNumber) {
     return -2*n - stubNumber - 1;
 }
 
-static stList *convertReferenceToAdjacencyEdges2(reference *ref) {
+static stList *convertReferenceToAdjacencyEdges2(refOrdering *ref) {
     stList *edges = stList_construct3(0, (void(*)(void *)) stIntTuple_destruct);
     for(int64_t i=0; i<reference_getIntervalNumber(ref); i++) {
         int64_t n = reference_getFirstOfInterval(ref, i);
@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
     assert(i == 1);
     assert(stubNumber >= 0 && stubNumber % 2 == 0);
     assert(nodeNumber >= stubNumber && nodeNumber % 2 == 0);
-    reference *ref = reference_construct(nodeNumber / 2 + stubNumber/2);
+    refOrdering *ref = reference_construct(nodeNumber / 2 + stubNumber/2);
     for(int64_t j=1; j<=stubNumber; j+=2) {
         reference_makeNewInterval(ref, j, j+1);
     }

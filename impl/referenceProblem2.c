@@ -43,7 +43,7 @@ static int refEdge_cmpByWeight(refEdge *e1, refEdge *e2) {
     return e1->weight > e2->weight ? 1 : (e1->weight < e2->weight ? -1 : refEdge_cmpByNode(e1, e2));
 }
 
-static int refEdge_cmpByReferencePosition(refEdge *e1, refEdge *e2, reference *ref) {
+static int refEdge_cmpByReferencePosition(refEdge *e1, refEdge *e2, refOrdering *ref) {
     return reference_cmp(ref, refEdge_to(e1), refEdge_to(e2));
 }
 
@@ -239,7 +239,7 @@ static double insertPoint_previous(insertPoint *iP) {
     return iP->previous;
 }
 
-static int insertPoint_cmp(insertPoint *iP1, insertPoint *iP2, reference *ref) {
+static int insertPoint_cmp(insertPoint *iP1, insertPoint *iP2, refOrdering *ref) {
     return reference_cmp(ref, insertPoint_adjNode(iP1), insertPoint_adjNode(iP2));
 }
 
@@ -261,15 +261,15 @@ struct _reference {
     stList *referenceIntervals;
 };
 
-reference *reference_construct(int64_t estimatedNodeNumber) {
-    reference *ref = st_malloc(sizeof(reference));
+refOrdering *reference_construct(int64_t estimatedNodeNumber) {
+    refOrdering *ref = st_malloc(sizeof(refOrdering));
     ref->nodeNumber = estimatedNodeNumber;
     ref->nodesInGraph = st_calloc(estimatedNodeNumber, sizeof(referenceTerm *));
     ref->referenceIntervals = stList_construct();
     return ref;
 }
 
-void reference_destruct(reference *ref) {
+void reference_destruct(refOrdering *ref) {
     for(int64_t i=0; i<ref->nodeNumber; i++) {
         if(ref->nodesInGraph[i] != NULL) {
             free(ref->nodesInGraph[i]);
@@ -280,13 +280,13 @@ void reference_destruct(reference *ref) {
     free(ref);
 }
 
-static referenceTerm *reference_getTerm(reference *ref, int64_t n) {
+static referenceTerm *reference_getTerm(refOrdering *ref, int64_t n) {
     assert(llabs(n) <= ref->nodeNumber);
     assert(llabs(n)-1 >= 0);
     return ref->nodesInGraph[llabs(n)-1]; 
 }
 
-void reference_insertNodeP(reference *ref, referenceTerm *rT) {
+void reference_insertNodeP(refOrdering *ref, referenceTerm *rT) {
     while(llabs(rT->node) > ref->nodeNumber) { //Expand array if necessary.
         int64_t newNodeNumber = 2 * ref->nodeNumber + 1;
         ref->nodesInGraph = st_realloc(ref->nodesInGraph, newNodeNumber * sizeof(referenceTerm *));
@@ -299,7 +299,7 @@ void reference_insertNodeP(reference *ref, referenceTerm *rT) {
     ref->nodesInGraph[llabs(rT->node)-1] = rT;
 }
 
-void reference_makeNewInterval(reference *ref, int64_t firstNode, int64_t lastNode) {
+void reference_makeNewInterval(refOrdering *ref, int64_t firstNode, int64_t lastNode) {
     assert(!reference_inGraph(ref, firstNode));
     assert(!reference_inGraph(ref, lastNode));
     referenceTerm *rTF = st_malloc(sizeof(referenceTerm)), *rTL = st_malloc(sizeof(referenceTerm));
@@ -318,7 +318,7 @@ void reference_makeNewInterval(reference *ref, int64_t firstNode, int64_t lastNo
     stList_append(ref->referenceIntervals, rTF);
 }
 
-void reference_removeIntervals(reference *ref, stSortedSet *firstNodesOfIntervalsToRemove) {
+void reference_removeIntervals(refOrdering *ref, stSortedSet *firstNodesOfIntervalsToRemove) {
     stList *updatedReferenceIntervals = stList_construct();
     for(int64_t i=0;i<stList_length(ref->referenceIntervals); i++) {
         int64_t node = reference_getFirstOfInterval(ref, i);
@@ -346,7 +346,7 @@ void reference_removeIntervals(reference *ref, stSortedSet *firstNodesOfInterval
     ref->referenceIntervals = updatedReferenceIntervals;
 }
 
-void reference_insertNode(reference *ref, int64_t pNode, int64_t node) {
+void reference_insertNode(refOrdering *ref, int64_t pNode, int64_t node) {
     referenceTerm *rT = st_malloc(sizeof(referenceTerm)), *rTP;
     rT->node = node;
     rTP = reference_getTerm(ref, pNode);
@@ -384,13 +384,13 @@ void reference_insertNode(reference *ref, int64_t pNode, int64_t node) {
     rT->index = rTP->index + (rT->nTerm->index - rTP->index) / 2;
 }
 
-static void reference_insertNode2(reference *ref, insertPoint *iP) {
+static void reference_insertNode2(refOrdering *ref, insertPoint *iP) {
     reference_insertNode(ref,
             insertPoint_previous(iP) ? insertPoint_adjNode(iP) : reference_getPrevious(ref, insertPoint_adjNode(iP)),
             insertPoint_node(iP));
 }
 
-static void reference_removeNode(reference *ref, int64_t n) {
+static void reference_removeNode(refOrdering *ref, int64_t n) {
     referenceTerm *rT = reference_getTerm(ref, n);
     assert(rT != NULL);
     if (rT->pTerm == NULL || rT->nTerm == NULL) {
@@ -402,41 +402,41 @@ static void reference_removeNode(reference *ref, int64_t n) {
     free(rT);
 }
 
-bool reference_inGraph(reference *ref, int64_t n) {
+bool reference_inGraph(refOrdering *ref, int64_t n) {
     return llabs(n) <= ref->nodeNumber && reference_getTerm(ref, n) != NULL;
 }
 
-int64_t reference_getFirstOfInterval(reference *ref, int64_t interval) {
+int64_t reference_getFirstOfInterval(refOrdering *ref, int64_t interval) {
     return ((referenceTerm *) stList_get(ref->referenceIntervals, interval))->node;
 }
 
-int64_t reference_getIntervalNumber(reference *ref) {
+int64_t reference_getIntervalNumber(refOrdering *ref) {
     return stList_length(ref->referenceIntervals);
 }
 
-int64_t reference_getFirst(reference *ref, int64_t n) {
+int64_t reference_getFirst(refOrdering *ref, int64_t n) {
     assert(reference_inGraph(ref, n));
     return reference_getTerm(ref, n)->first->node;
 }
 
-int64_t reference_getPrevious(reference *ref, int64_t n) {
+int64_t reference_getPrevious(refOrdering *ref, int64_t n) {
     assert(reference_inGraph(ref, n));
     referenceTerm *rT = reference_getTerm(ref, n);
     return rT->pTerm != NULL ? rT->pTerm->node : INT64_MAX;
 }
 
-bool reference_getOrientation(reference *ref, int64_t n) {
+bool reference_getOrientation(refOrdering *ref, int64_t n) {
     assert(reference_inGraph(ref, n));
     return reference_getTerm(ref, n)->node == n;
 }
 
-int64_t reference_getNext(reference *ref, int64_t n) {
+int64_t reference_getNext(refOrdering *ref, int64_t n) {
     assert(reference_inGraph(ref, n));
     referenceTerm *rT = reference_getTerm(ref, n);
     return rT->nTerm != NULL ? rT->nTerm->node : INT64_MAX;
 }
 
-int64_t reference_getLast(reference *ref, int64_t n) {
+int64_t reference_getLast(refOrdering *ref, int64_t n) {
     assert(reference_inGraph(ref, n));
     while (reference_getNext(ref, n) != INT64_MAX) {
         n = reference_getNext(ref, n);
@@ -444,7 +444,7 @@ int64_t reference_getLast(reference *ref, int64_t n) {
     return n;
 }
 
-bool reference_isConsistent(reference *ref, int64_t m, int64_t n) {
+bool reference_isConsistent(refOrdering *ref, int64_t m, int64_t n) {
     if(reference_getFirst(ref, m) == reference_getFirst(ref,
             n)) {
         if(!reference_getOrientation(ref, m)) {
@@ -455,7 +455,7 @@ bool reference_isConsistent(reference *ref, int64_t m, int64_t n) {
     return 0;
 }
 
-int reference_cmp(reference *ref, int64_t n1, int64_t n2) {
+int reference_cmp(refOrdering *ref, int64_t n1, int64_t n2) {
     referenceTerm *rT1 = reference_getTerm(ref, n1), *rT2 = reference_getTerm(ref, n2);
     assert(rT1 != NULL);
     assert(rT2 != NULL);
@@ -465,7 +465,7 @@ int reference_cmp(reference *ref, int64_t n1, int64_t n2) {
     return rT1->index > rT2->index ? 1 : rT1->index < rT2->index ? -1 : 0;
 }
 
-int64_t reference_getRemainingIntervalLength(reference *ref, int64_t n) {
+int64_t reference_getRemainingIntervalLength(refOrdering *ref, int64_t n) {
     int64_t j=0;
     while(n != INT64_MAX) {
         j++;
@@ -474,7 +474,7 @@ int64_t reference_getRemainingIntervalLength(reference *ref, int64_t n) {
     return j;
 }
 
-void reference_log(reference *ref) {
+void reference_log(refOrdering *ref) {
     st_logInfo("Logging reference with %" PRIi64 " intervals\n", reference_getIntervalNumber(ref));
     for (int64_t i = 0; i < reference_getIntervalNumber(ref); i++) {
         st_logInfo("Interval %" PRIi64 ", nodes:", i);
@@ -496,7 +496,7 @@ static void setFirstPointer(referenceTerm *term, referenceTerm *firstTerm) {
     } while(term != NULL);
 }
 
-void reference_translocateIntervals(reference *ref, int64_t pNode1, int64_t nNode2) {
+void reference_translocateIntervals(refOrdering *ref, int64_t pNode1, int64_t nNode2) {
     referenceTerm *pNode1Term = reference_getTerm(ref, pNode1);
     assert(pNode1Term != NULL);
     referenceTerm *nNode1Term = pNode1Term->nTerm;
@@ -516,7 +516,7 @@ void reference_translocateIntervals(reference *ref, int64_t pNode1, int64_t nNod
     setFirstPointer(nNode2Term, pNode1Term->first);
 }
 
-void reference_splitInterval(reference *ref, int64_t pNode, int64_t stub1, int64_t stub2) {
+void reference_splitInterval(refOrdering *ref, int64_t pNode, int64_t stub1, int64_t stub2) {
     assert(reference_getNext(ref, pNode) != INT64_MAX);
     assert(!reference_inGraph(ref, stub1));
     assert(!reference_inGraph(ref, stub2));
@@ -528,7 +528,7 @@ void reference_splitInterval(reference *ref, int64_t pNode, int64_t stub1, int64
 /*
  * Returns the integer value of the absolute highest valued node in the reference.
  */
-int64_t reference_getMaximumNode(reference *ref) {
+int64_t reference_getMaximumNode(refOrdering *ref) {
 	int64_t maxNode = INT64_MIN;
 	for(int64_t interval=0; interval<reference_getIntervalNumber(ref); interval++) {
 		int64_t node = reference_getFirstOfInterval(ref, interval);
@@ -547,7 +547,7 @@ int64_t reference_getMaximumNode(reference *ref) {
  * Reference algorithm
  */
 
-static stList *getRelevantEdges(refAdjList *aL, reference *ref, int64_t n) {
+static stList *getRelevantEdges(refAdjList *aL, refOrdering *ref, int64_t n) {
     stList *edges = stList_construct3(0, free);
     refAdjListIt it = adjList_getEdgeIt(aL, n);
     refEdge e = refAdjListIt_getNext(&it);
@@ -565,7 +565,7 @@ static stList *getRelevantEdges(refAdjList *aL, reference *ref, int64_t n) {
     return edges;
 }
 
-static stList *getInsertPointsPrevious(int64_t n, stList *edges, reference *ref) {
+static stList *getInsertPointsPrevious(int64_t n, stList *edges, refOrdering *ref) {
     stList *insertPoints = stList_construct();
     long double f = 0.0;
     int64_t intervalName = INT64_MAX;
@@ -585,7 +585,7 @@ static stList *getInsertPointsPrevious(int64_t n, stList *edges, reference *ref)
     return insertPoints;
 }
 
-static stList *getInsertPointsNext(int64_t n, stList *edges, reference *ref) {
+static stList *getInsertPointsNext(int64_t n, stList *edges, refOrdering *ref) {
     stList *insertPoints = stList_construct();
     long double f = 0.0;
     int64_t intervalName = INT64_MAX;
@@ -605,7 +605,7 @@ static stList *getInsertPointsNext(int64_t n, stList *edges, reference *ref) {
     return insertPoints;
 }
 
-static void getInsertionPoints(int64_t n, stList *previousEdges, stList *nextEdges, reference *ref, refAdjList *aL, refAdjList *dAL,
+static void getInsertionPoints(int64_t n, stList *previousEdges, stList *nextEdges, refOrdering *ref, refAdjList *aL, refAdjList *dAL,
         stList *insertPoints) {
     stList *previousInsertPoints = getInsertPointsPrevious(n, previousEdges, ref);
     stList_appendAll(insertPoints, previousInsertPoints);
@@ -671,7 +671,7 @@ static void getInsertionPoints(int64_t n, stList *previousEdges, stList *nextEdg
     stList_destruct(nextInsertPoints);
 }
 
-static insertPoint *getABestInsertNode(int64_t n, refAdjList *aL, refAdjList *dAL, reference *ref) {
+static insertPoint *getABestInsertNode(int64_t n, refAdjList *aL, refAdjList *dAL, refOrdering *ref) {
     assert(!reference_inGraph(ref, n));
     insertPoint *bestIP = NULL;
     //Get list of edges to nodes already in the reference
@@ -700,7 +700,7 @@ static insertPoint *getABestInsertNode(int64_t n, refAdjList *aL, refAdjList *dA
     return bestIP;
 }
 
-static void insertNode(int64_t n, refAdjList *aL, refAdjList *dAL, reference *ref) {
+static void insertNode(int64_t n, refAdjList *aL, refAdjList *dAL, refOrdering *ref) {
     if (!reference_inGraph(ref, n)) { //Have a node to add
         insertPoint *bestIP = getABestInsertNode(n, aL, dAL, ref);
         if (bestIP == NULL) { //Make up a location
@@ -728,7 +728,7 @@ struct _connectedNodes {
     stSortedSet *byWeight;
     stSortedSet *byNode;
     refAdjList *aL;
-    reference *ref;
+    refOrdering *ref;
     int64_t misses;
 };
 
@@ -776,7 +776,7 @@ static void connectedNodes_addNode(connectedNodes *cN, int64_t n) {
     refAdjListIt_destruct(&it);
 }
 
-static connectedNodes *connectedNodes_construct(refAdjList *aL, reference *ref) {
+static connectedNodes *connectedNodes_construct(refAdjList *aL, refOrdering *ref) {
     /*
      * Builds the set of nodes connected to nodes in the reference but not currently in the reference.
      */
@@ -811,7 +811,7 @@ static bool connectedNodes_empty(connectedNodes *cN) {
     return stSortedSet_size(cN->byNode) == 0;
 }
 
-static insertPoint *connectedNodes_popBestInsert(connectedNodes *cN, refAdjList *aL, refAdjList *dAL, reference *ref, double wiggle) {
+static insertPoint *connectedNodes_popBestInsert(connectedNodes *cN, refAdjList *aL, refAdjList *dAL, refOrdering *ref, double wiggle) {
     assert(wiggle <= 1.0);
     int64_t i = 0;
     while (1) {
@@ -838,7 +838,7 @@ static insertPoint *connectedNodes_popBestInsert(connectedNodes *cN, refAdjList 
  * Actual algorithms to make the reference.
  */
 
-void makeReferenceGreedily2(refAdjList *aL, refAdjList *dAL, reference *ref, double wiggle) {
+void makeReferenceGreedily2(refAdjList *aL, refAdjList *dAL, refOrdering *ref, double wiggle) {
     assert(reference_getIntervalNumber(ref) > 0 || refAdjList_getNodeNumber(aL) == 0);
     connectedNodes *cN = connectedNodes_construct(aL, ref);
     //Iterate over the nodes to check any nodes that are not in the reference
@@ -864,7 +864,7 @@ void makeReferenceGreedily2(refAdjList *aL, refAdjList *dAL, reference *ref, dou
     connectedNodes_destruct(cN);
 }
 
-void updateReferenceGreedily(refAdjList *aL, refAdjList *dAL, reference *ref, int64_t permutations) {
+void updateReferenceGreedily(refAdjList *aL, refAdjList *dAL, refOrdering *ref, int64_t permutations) {
     for (int64_t i = 0; i < permutations; i++) {
         for (int64_t j = 1; j <= refAdjList_getNodeNumber(aL); j++) {
             int64_t n = st_randomInt(1, refAdjList_getNodeNumber(aL) + 1);
@@ -878,7 +878,7 @@ void updateReferenceGreedily(refAdjList *aL, refAdjList *dAL, reference *ref, in
     }
 }
 
-static bool nudge(int64_t n, refAdjList *dAL, refAdjList *aL, reference *ref, int64_t maxNudge) {
+static bool nudge(int64_t n, refAdjList *dAL, refAdjList *aL, refOrdering *ref, int64_t maxNudge) {
     //Setup the best insertion spot
     int64_t bestInsert = INT64_MAX;
     int64_t k = reference_getPrevious(ref, n);
@@ -930,7 +930,7 @@ static bool nudge(int64_t n, refAdjList *dAL, refAdjList *aL, reference *ref, in
     return 0;
 }
 
-void nudgeGreedily(refAdjList *dAL, refAdjList *aL, reference *ref, int64_t permutations, int64_t maxNudge) {
+void nudgeGreedily(refAdjList *dAL, refAdjList *aL, refOrdering *ref, int64_t permutations, int64_t maxNudge) {
     for (int64_t i = 0; i < permutations; i++) {
         bool madeNudge = 0;
         for (int64_t j = 0; j < reference_getIntervalNumber(ref); j++) {
@@ -949,7 +949,7 @@ void nudgeGreedily(refAdjList *dAL, refAdjList *aL, reference *ref, int64_t perm
     }
 }
 
-static long double getSumOfConsistentAdjacenciesScore(int64_t n, refAdjList *aL, reference *ref) {
+static long double getSumOfConsistentAdjacenciesScore(int64_t n, refAdjList *aL, refOrdering *ref) {
     long double score = 0.0;
     refAdjListIt it = adjList_getEdgeIt(aL, n);
     refEdge e = refAdjListIt_getNext(&it);
@@ -964,7 +964,7 @@ static long double getSumOfConsistentAdjacenciesScore(int64_t n, refAdjList *aL,
     return score;
 }
 
-long double getReferenceScore(refAdjList *aL, reference *ref) {
+long double getReferenceScore(refAdjList *aL, refOrdering *ref) {
     long double score = 0.0;
     for (int64_t n = 1; n <= refAdjList_getNodeNumber(aL); n++) {
         score += getSumOfConsistentAdjacenciesScore(n, aL, ref);
@@ -973,7 +973,7 @@ long double getReferenceScore(refAdjList *aL, reference *ref) {
     return score;
 }
 
-int64_t getBadAdjacencyCount(refAdjList *aL, reference *ref) {
+int64_t getBadAdjacencyCount(refAdjList *aL, refOrdering *ref) {
     int64_t badAdjacencies = 0;
     for (int64_t i = 0; i < reference_getIntervalNumber(ref); i++) {
         int64_t n = reference_getFirstOfInterval(ref, i);
@@ -988,7 +988,7 @@ int64_t getBadAdjacencyCount(refAdjList *aL, reference *ref) {
     return badAdjacencies;
 }
 
-static stList *getValidEdges(int64_t n, refAdjList *aL, reference *ref) {
+static stList *getValidEdges(int64_t n, refAdjList *aL, refOrdering *ref) {
     /*
      * Get edges from n that are consistent with the reference ordering.
      */
@@ -1009,7 +1009,7 @@ static stList *getValidEdges(int64_t n, refAdjList *aL, reference *ref) {
     return validEdges;
 }
 
-static bool visitP(int64_t n, stSortedSet *visited, stSortedSet *visiting, refAdjList *aL, reference *ref,
+static bool visitP(int64_t n, stSortedSet *visited, stSortedSet *visiting, refAdjList *aL, refOrdering *ref,
         stList *ordering, stList *stack) {
     assert(reference_inGraph(ref, n));
     stIntTuple *i = stIntTuple_construct1(n);
@@ -1029,7 +1029,7 @@ static bool visitP(int64_t n, stSortedSet *visited, stSortedSet *visiting, refAd
     }
 }
 
-static void visit(int64_t n, stSortedSet *visited, stSortedSet *visiting, refAdjList *aL, reference *ref,
+static void visit(int64_t n, stSortedSet *visited, stSortedSet *visiting, refAdjList *aL, refOrdering *ref,
         stList *ordering, stList *stack) {
     /*
      * Do DFS of nodes using edges that are consistent with the graph.
@@ -1057,7 +1057,7 @@ static void visit(int64_t n, stSortedSet *visited, stSortedSet *visiting, refAdj
     }
 }
 
-static void reorderReferenceIntervalToAvoidBreakpoints(int64_t startNode, refAdjList *aL, reference *ref) {
+static void reorderReferenceIntervalToAvoidBreakpoints(int64_t startNode, refAdjList *aL, refOrdering *ref) {
     /*
      * Create a topological sort of the nodes in the reference interval, choosing to traverse more highly weighted edges first,
      * with the aim of creating fewer edges that are inconsistent.
@@ -1101,13 +1101,13 @@ static void reorderReferenceIntervalToAvoidBreakpoints(int64_t startNode, refAdj
     stList_destruct(ordering);
 }
 
-void reorderReferenceToAvoidBreakpoints(refAdjList *aL, reference *ref) {
+void reorderReferenceToAvoidBreakpoints(refAdjList *aL, refOrdering *ref) {
     for (int64_t i = 0; i < reference_getIntervalNumber(ref); i++) {
         reorderReferenceIntervalToAvoidBreakpoints(reference_getFirstOfInterval(ref, i), aL, ref);
     }
 }
 
-stList *splitReferenceAtIndicatedLocations(reference *ref, bool (*refSplitFn)(int64_t, reference *, void *), void *extraArgs) {
+stList *splitReferenceAtIndicatedLocations(refOrdering *ref, bool (*refSplitFn)(int64_t, refOrdering *, void *), void *extraArgs) {
 	int64_t indexOfFirstNewStub = reference_getMaximumNode(ref)+1; //The new stubs need to be unique in the reference
 	assert(indexOfFirstNewStub < INT64_MAX);
 	assert(!reference_inGraph(ref, indexOfFirstNewStub));
@@ -1137,7 +1137,7 @@ static void removeStub(stSortedSet *extraStubNodesSet, int64_t node) {
     stIntTuple_destruct(stub);
 }
 
-stList *remakeReferenceIntervals(reference *ref, stList *referenceIntervalsToPreserve, stList *extraStubNodes) {
+stList *remakeReferenceIntervals(refOrdering *ref, stList *referenceIntervalsToPreserve, stList *extraStubNodes) {
     stSortedSet *extraStubNodesSet = stList_getSortedSet(extraStubNodes, (int (*)(const void *, const void *))stIntTuple_cmpFn);
     stSortedSet *firstNodesOfIntervalsToRemove = stSortedSet_construct3((int (*)(const void *, const void *))stIntTuple_cmpFn, (void (*)(void *))stIntTuple_destruct);
     for(int64_t i=0; i<stList_length(referenceIntervalsToPreserve); i++) {
@@ -1150,7 +1150,7 @@ stList *remakeReferenceIntervals(reference *ref, stList *referenceIntervalsToPre
         int64_t nodeAdjacentEndNode = reference_getFirst(ref, endNode);
         if(nodeAdjacentStartNode != endNode) { //We have identified a case where we need to scaffold across a break.
             assert(llabs(nodeAdjacentStartNode) != llabs(endNode));
-            //void reference_translocateIntervals(reference *ref, int64_t pNode1, int64_t nNode2)
+            //void reference_translocateIntervals(refOrdering *ref, int64_t pNode1, int64_t nNode2)
             reference_translocateIntervals(ref, reference_getPrevious(ref, nodeAdjacentStartNode), reference_getNext(ref, nodeAdjacentEndNode));
             //Check we have the correct connectivity
             assert(reference_getLast(ref, startNode) == endNode);

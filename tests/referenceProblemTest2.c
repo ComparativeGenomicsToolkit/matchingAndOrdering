@@ -13,7 +13,7 @@
 
 static refAdjList *aL = NULL;
 static refAdjList *dAL = NULL;
-static reference *ref;
+static refOrdering *ref;
 static int64_t nodeNumber;
 static int64_t intervalNumber;
 static int64_t weightNumber;
@@ -277,7 +277,7 @@ static void testReference_splitInterval(CuTest *testCase) {
     }
 }
 
-bool toySplitFn(int64_t pNode, reference *ref, void *extraArgs) {
+bool toySplitFn(int64_t pNode, refOrdering *ref, void *extraArgs) {
     return st_random() > 0.5;
 }
 
