@@ -825,6 +825,7 @@ static insertPoint *connectedNodes_popBestInsert(connectedNodes *cN, refAdjList 
         if (stSortedSet_size(cN->byWeight) == 0 || refEdge_weight(stSortedSet_getLast(cN->byWeight)) * wiggle
                 <= refEdge_weight((refEdge *) cNE) || i++ >= stSortedSet_size(cN->byWeight)) {
             stSortedSet_remove(cN->byNode, cNE);
+            free(cNE);
             return iP;
         }
         stSortedSet_insert(cN->byWeight, cNE);
