@@ -7,12 +7,16 @@
 #include "CuTest.h"
 #include "sonLib.h"
 
-CuSuite* referenceProblem2TestSuite(void);
+extern CuSuite* referenceProblem2TestSuite(void);
+extern CuSuite* cyclesConstrainedMatchingAlgorithmsTestSuite(void);
+extern CuSuite* matchingAlgorithmsTestSuite(void);
 
 int referenceRunAllTests(void) {
     CuString *output = CuStringNew();
     CuSuite* suite = CuSuiteNew();
     CuSuiteAddSuite(suite, referenceProblem2TestSuite());
+    CuSuiteAddSuite(suite, cyclesConstrainedMatchingAlgorithmsTestSuite());
+    CuSuiteAddSuite(suite, matchingAlgorithmsTestSuite());
 
     CuSuiteRun(suite);
     CuSuiteSummary(suite, output);
