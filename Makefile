@@ -23,10 +23,10 @@ ${LIBDIR}/matchingAndOrdering.a : ${libSources} ${libHeaders}
 	cp ${libHeaders} ${LIBDIR}/
 
 ${BINDIR}/matchingAndOrderingTests : ${libTests} ${libSources} ${libHeaders} ${LIBDIR}/matchingAndOrdering.a ${LIBDEPENDS}
-	${CC} ${CFLAGS} ${CPPFLAGS} -o ${BINDIR}/matchingAndOrderingTests ${libTests} ${LIBDIR}/matchingAndOrdering.a ${LDLIBS}
+	${CC} ${CFLAGS} ${CPPFLAGS} ${LDFLAGS} -o ${BINDIR}/matchingAndOrderingTests ${libTests} ${LIBDIR}/matchingAndOrdering.a ${LDLIBS}
 
 ${testBin}/referenceMedianProblemTest2 : ${testBin}/referenceMedianProblemTest2.c ${libSources} ${libHeaders} ${LIBDIR}/matchingAndOrdering.a ${LIBDEPENDS} 
-	${CC} ${CFLAGS} ${CPPFLAGS} -o ${testBin}/referenceMedianProblemTest2 ${testBin}/referenceMedianProblemTest2.c ${LIBDIR}/matchingAndOrdering.a ${LDLIBS}
+	${CC} ${CFLAGS} ${CPPFLAGS} ${LDFLAGS} -o ${testBin}/referenceMedianProblemTest2 ${testBin}/referenceMedianProblemTest2.c ${LIBDIR}/matchingAndOrdering.a ${LDLIBS}
 
 clean : 
 	cd externalTools && ${MAKE} clean
