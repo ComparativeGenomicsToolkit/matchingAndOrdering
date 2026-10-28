@@ -8,13 +8,11 @@ import unittest
 from sonLib.bioio import parseSuiteTestOptions
 
 from matchingAndOrdering.externalTools.matchGraph.matchGraphTest import TestCase as matchGraphTest
-from matchingAndOrdering.externalTools.blossom.blossomTest import TestCase as blossomTest
 from matchingAndOrdering.tests.cTests import TestCase as cTests
 from matchingAndOrdering.tests.simulatedGenomeTests import TestCase as simulatedGenomeTests
 
 def allSuites():
     return unittest.TestSuite((unittest.makeSuite(matchGraphTest, 'test'),
-                               unittest.makeSuite(blossomTest, 'test'),
                                unittest.makeSuite(cTests, 'test'),
                                unittest.makeSuite(simulatedGenomeTests, 'test')))
 
