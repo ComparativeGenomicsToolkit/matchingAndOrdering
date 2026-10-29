@@ -53,7 +53,7 @@ class TestCase(unittest.TestCase):
             self.tempFiles.append(tempOutputFile)
 
             # Create sample/test input graph file
-            system("blossom_randGraph.py > %s" % tempInputFile)
+            system("randGraph.py > %s" % tempInputFile)
 
             # Run matchGraph.py
             system("matchGraph.py -e %s -w %s" % (tempInputFile, tempOutputFile))

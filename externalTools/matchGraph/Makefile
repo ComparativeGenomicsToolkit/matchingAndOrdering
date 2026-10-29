@@ -1,6 +1,6 @@
 rootPath = ../..
 include ${rootPath}/include.mk
-progs = mwmatching.py matchGraph.py
+progs = mwmatching.py matchGraph.py randGraph.py
 
 all: ${progs:%=${BINDIR}/%}
 

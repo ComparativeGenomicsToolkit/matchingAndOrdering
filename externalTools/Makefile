@@ -2,7 +2,7 @@ rootPath = ..
 include ${rootPath}/include.mk
 
 # order is important, libraries first
-modules = blossom matchGraph
+modules = matchGraph
 #pulldown
 .PHONY: all %.all clean %.clean
 

@@ -2,3 +2,11 @@ This is code used for computing matchings and finding (suboptimal) solutions to 
 
 The project should be located in the same directory containing sonLib (https://github.com/benedictpaten/sonLib), which must be installed.
 Given this requirement a simple 'make all' should be enough to build the project. 'make test' will then do a batch of obligatory tests.
+
+The matching algorithms are in inc/stMatchingAlgorithms.h. chooseMatching_edmonds computes an exact maximum weight
+matching in process, with a C translation of Joris van Rantwijk's MIT licensed implementation of Edmonds' blossom
+algorithm; it replaces the Blossom V program (blossom5), which this project used to bundle but whose license does not
+allow redistribution. chooseMatching_maximumWeightMatching and chooseMatching_maximumCardinalityMatching run
+externalTools/matchGraph/matchGraph.py instead.
+
+The code is released under the MIT license, see LICENSE.txt.

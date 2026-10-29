@@ -47,12 +47,12 @@ int64_t matchingWeight(stList *matching) {
 }
 
 /*
- * Code to talk to the blossom5 maximum weight perfect matching algorithm.
+ * Code to talk to matchGraph.py, which computes maximum weight and maximum cardinality matchings.
  */
 
 static void writeGraph(FILE *fileHandle, stList *edges, int64_t nodeNumber) {
     /*
-     * Writes out just the adjacencies in the blossom format.
+     * Writes out the adjacencies in the format matchGraph.py reads.
      */
     int64_t edgeNumber = stList_length(edges);
     fprintf(fileHandle, "%" PRIi64 " %" PRIi64 "\n", nodeNumber, edgeNumber);
@@ -61,46 +61,8 @@ static void writeGraph(FILE *fileHandle, stList *edges, int64_t nodeNumber) {
         int64_t from =  stIntTuple_get(edge, 0);
         int64_t to = stIntTuple_get(edge, 1);
         int64_t weight = stIntTuple_get(edge, 2);
-        //All the algorithms are minimisation algorithms, so we invert the sign.
         fprintf(fileHandle, "%" PRIi64 " %" PRIi64 " %" PRIi64 "\n", from, to, weight);
     }
-}
-
-static void writeCliqueGraph(FILE *fileHandle, stList *edges, int64_t nodeNumber, bool negativeWeights) {
-    /*
-     * Writes out a representation of the adjacencies and ends as a graph readable by blossom.
-     * Writes out additional edges so that every pair of nodes is connected.
-     */
-    int64_t edgeNumber = ((nodeNumber * nodeNumber)  - nodeNumber) / 2;
-    fprintf(fileHandle, "%" PRIi64 " %" PRIi64 "\n", nodeNumber, edgeNumber);
-    stSortedSet *seen = stSortedSet_construct3((int (*)(const void *, const void *))stIntTuple_cmpFn, (void (*)(void *))stIntTuple_destruct);
-    int64_t edgesWritten = 0;
-    for(int64_t i=0; i<stList_length(edges); i++) {
-        stIntTuple *edge = stList_get(edges, i);
-        int64_t from =  stIntTuple_get(edge, 0);
-        int64_t to = stIntTuple_get(edge, 1);
-        assert(from < nodeNumber);
-        assert(to < nodeNumber);
-        assert(from >= 0);
-        assert(to >= 0);
-        assert(from != to);
-        int64_t weight = stIntTuple_get(edge, 2);
-        //If is a minimisation algorithms we invert the sign..
-        fprintf(fileHandle, "%" PRIi64 " %" PRIi64 " %" PRIi64 "\n", from, to, negativeWeights ? -weight : weight);
-        edgesWritten++;
-        addEdgeToSet(seen, from, to);
-    }
-    for(int64_t i=0; i<nodeNumber; i++) {
-        for(int64_t j=i+1; j<nodeNumber; j++) {
-            if(!edgeInSet(seen, i, j)) {
-                fprintf(fileHandle, "%" PRIi64 " %" PRIi64 " 0\n", i, j);
-                edgesWritten++;
-            }
-        }
-    }
-    //Cleanup
-    stSortedSet_destruct(seen);
-    assert(edgeNumber == edgesWritten);
 }
 
 static stHash *putEdgesInHash(stList *edges) {
@@ -114,7 +76,7 @@ static stHash *putEdgesInHash(stList *edges) {
 
 static stList *readMatching(FILE *fileHandle, stList *originalEdges) {
     /*
-     * Reads the matching created by Blossum.
+     * Reads the matching written by matchGraph.py.
      */
     stHash *originalEdgesHash = putEdgesInHash(originalEdges);
     char *line = stFile_getLineFromFile(fileHandle);
@@ -160,13 +122,7 @@ static stList *chooseAdjacencyPairing_externalProgram(stList *edges, int64_t nod
      * We write the graph to a temp file.
      */
     FILE *fileHandle = fopen(tempInputFile, "w");
-    if(strcmp(programName, "blossom5") == 0) { //Must be all connected as
-        //generates perfect matchings.
-        writeCliqueGraph(fileHandle, edges, nodeNumber, 1);
-    }
-    else {
-        writeGraph(fileHandle, edges, nodeNumber);
-    }
+    writeGraph(fileHandle, edges, nodeNumber);
     fclose(fileHandle);
 
     /*
@@ -197,10 +153,6 @@ static stList *chooseAdjacencyPairing_externalProgram(stList *edges, int64_t nod
     free(tempOutputFile);
 
     return matching;
-}
-
-stList *chooseMatching_blossom5(stList *edges, int64_t nodeNumber) {
-    return chooseAdjacencyPairing_externalProgram(edges, nodeNumber, "blossom5");
 }
 
 stList *chooseMatching_maximumCardinalityMatching(stList *edges, int64_t nodeNumber) {

@@ -414,7 +414,7 @@ static void testGetMatchingWithCyclicConstraints_MaximumWeight_DontSweatJoinedSt
         CuTest *testCase) {
     st_logInfo(
             "Running matching test without disjoint stubs and maximum weight matching");
-    testGetMatchingWithCyclicConstraints(testCase, 0, chooseMatching_blossom5,
+    testGetMatchingWithCyclicConstraints(testCase, 0, chooseMatching_edmonds,
             0, 500, 10);
 }
 
@@ -422,7 +422,7 @@ static void testGetMatchingWithCyclicConstraints_MaximumWeight_MakeStubsDisjoint
         CuTest *testCase) {
     st_logInfo(
             "Running matching test with disjoint stubs and maximum weight matching");
-    testGetMatchingWithCyclicConstraints(testCase, 1, chooseMatching_blossom5,
+    testGetMatchingWithCyclicConstraints(testCase, 1, chooseMatching_edmonds,
             0, 500, 10);
 }
 
